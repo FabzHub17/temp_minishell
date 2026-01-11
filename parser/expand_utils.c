@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "builtin.h"
 
 /*
 ** Expand variable in unquoted context
@@ -44,7 +45,9 @@ int	expand_env_variable(char *str, int i, t_expand_args *expand_args)
 	var_name = extract_var_name(str, i);
 	if (var_name == NULL)
 		return (i);
-	var_value = getenv(var_name);
+
+	var_value = get_env_value(expand_args->env, var_name);
+	
 	if (var_value != NULL)
 	{
 		expand_args->result = ft_strjoin_free(expand_args->result,

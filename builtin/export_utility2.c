@@ -24,7 +24,7 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return ((unsigned char)*s1 - (unsigned char)*s2);
 }
 
-static char     **copy_env(char **env)
+char     **copy_env(char **env) // modified
 {
         int     len;
         int     i;

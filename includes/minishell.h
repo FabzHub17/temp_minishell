@@ -31,6 +31,7 @@
 # include "../libft/includes/libft.h"
 # include "../libft/includes/ft_printf.h"
 
+
 /* ===========================
 **  PARSER STRUCTS (FABIO)
 ** =========================== */
@@ -78,6 +79,7 @@ typedef struct s_shell
 // Expansion context structure
 typedef struct s_expand_args
 {
+	char			**env;   // modified
 	int				exit_status;
 	char			*result;
 }					t_expand_args;

@@ -42,5 +42,6 @@ void    export_sorted(char **env);
 /* UTILITY */
 char    *get_env_value(char **env, char *key);
 int     ft_strcmp(const char *s1, const char *s2);
+char     **copy_env(char **env);
 
 #endif

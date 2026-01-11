@@ -11,8 +11,8 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "execution.h"
 #include "builtin.h"
+#include "execution.h"
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -81,7 +81,7 @@ void	init_shell(t_shell *shell, char **env)
 {
 	shell->tokens = NULL;
 	shell->commands = NULL;
-	shell->env = env;  //  <-- make a copy !!!
+	shell->env = copy_env(env);  //  <-- make a copy !!!
 	shell->exit_status = 0;
 }
 

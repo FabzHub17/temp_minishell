@@ -86,7 +86,7 @@ OBJ = $(SRC:%.c=$(OBJ_DIR)/%.o)
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror \
-         -I$(INC_DIR) -I$(LIBFT_DIR)/includes
+         -I$(INC_DIR) -I$(LIBFT_DIR)/includes -g
 
 # **************************************************************************** #
 #                                    RULES                                     #

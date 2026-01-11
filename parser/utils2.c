@@ -122,3 +122,4 @@ void	add_command(t_cmd **cmd_list, t_cmd *new_cmd)
 		current->next = new_cmd;
 	}
 }
+

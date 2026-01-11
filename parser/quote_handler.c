@@ -21,7 +21,8 @@ void	process_quotes_and_expansion(t_shell *shell)
 	t_token			*current_token;
 	char			*processed_value;
 	t_expand_args	expand_args;
-
+	
+	expand_args.env = shell->env; // modified
 	expand_args.exit_status = shell->exit_status;
 	current_token = shell->tokens;
 	while (current_token != NULL)
