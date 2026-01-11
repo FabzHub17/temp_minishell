@@ -79,7 +79,7 @@ static int  open_outfile_append(const char *path)
 ** che è un file temporaneo già riempito. Allora lo tratti come un R_IN.
 ** (Quando farete davvero l'heredoc, basterà adattare questa parte.)
 */
-int apply_redirections(t_redir *redirs, t_envc *envc)
+int apply_redirections(t_redir *redirs, t_shell *shell)
 {
     while (redirs)
     {
@@ -87,7 +87,7 @@ int apply_redirections(t_redir *redirs, t_envc *envc)
         {
             if (open_infile(redirs->target) < 0)
             {
-                envc->exit_code = 1;
+                shell->envc.exit_code = 1;
                 return (-1);
             }
         }
@@ -95,7 +95,7 @@ int apply_redirections(t_redir *redirs, t_envc *envc)
         {
             if (open_outfile_trunc(redirs->target) < 0)
             {
-                envc->exit_code = 1;
+                shell->envc.exit_code = 1;
                 return (-1);
             }
         }
@@ -103,7 +103,7 @@ int apply_redirections(t_redir *redirs, t_envc *envc)
         {
             if (open_outfile_append(redirs->target) < 0)
             {
-                envc->exit_code = 1;
+                shell->envc.exit_code = 1;
                 return (-1);
             }
         }

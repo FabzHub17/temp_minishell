@@ -34,7 +34,7 @@ static void	restore_stdio_fds(int in_backup, int out_backup)
 }
 
 /* Esegue un builtin nel processo padre, gestendo anche le redirections.*/
-static int	exec_builtin_in_parent(t_exec_cmd *cmd, t_envc *envc)
+static int	exec_builtin_in_parent(t_exec_cmd *cmd, t_shell *shell)
 {
 	int	in_backup;
 	int	out_backup;
@@ -44,26 +44,28 @@ static int	exec_builtin_in_parent(t_exec_cmd *cmd, t_envc *envc)
 	if (in_backup == -1 || out_backup == -1)
 	{
 		perror("minishell: dup");
-		envc->exit_code = 1;
+		shell->envc.exit_code = 1;
 		return (1);
 	}
-	if (apply_redirections(cmd->redirs, envc) != 0)
+	if (apply_redirections(cmd->redirs, shell) != 0)
 	{
 		restore_stdio_fds(in_backup, out_backup);
-		return (envc->exit_code);
+		return (shell->envc.exit_code);
 	}
-	status = execute_builtin(cmd, envc);
-	envc->exit_code = status;
+	status = execute_builtin(cmd, shell);
+	shell->envc.exit_code = status;
 	restore_stdio_fds(in_backup, out_backup);
 	return (status);
 }
 
-void	run_pipeline(t_pipeline *p, t_envc *envc)
+void	run_pipeline(t_pipeline *p, t_shell *shell)
 {
 	t_exec_cmd	*cmd;
 
 	if (!p || p->count == 0)
 		return ;
+	// Create a local envc pointer for compatibility
+	t_envc *envc = &shell->envc;  // modificato
 	if (handle_heredocs(p, envc) != 0)
 		return ;
 	if (p->count == 1)
@@ -72,7 +74,7 @@ void	run_pipeline(t_pipeline *p, t_envc *envc)
 		if (!cmd || !cmd->argv || !cmd->argv[0])
 			return ;
 		if (is_builtin(cmd->argv[0]))
-			exec_builtin_in_parent(cmd, envc);
+			exec_builtin_in_parent(cmd, shell);
 		else
 			execute_single_cmd(cmd, envc);
 	}

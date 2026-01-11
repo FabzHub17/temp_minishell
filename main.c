@@ -20,13 +20,13 @@ int	main(int ac, char **av, char **envp)
 {
 	char		*line;
 	t_shell		shell;
-	t_envc		envc;
+	//t_envc		envc;    modificato
 	t_pipeline	*pipeline;
 
 	(void)ac;
 	(void)av;
-	init_shell(&shell, envp);
-	if (init_envc(&envc, shell.env) < 0)
+	init_shell(&shell, envp);  // modificato
+	if (shell.envc.env == NULL)
 		return (1);
 	while (1)
 	{
@@ -40,7 +40,7 @@ int	main(int ac, char **av, char **envp)
 		if (g_signal == SIGINT)
 		{
 			shell.exit_status = 130;
-			envc.exit_code = 130;
+			shell.envc.exit_code = 130;
 			g_signal = 0;
 		}
 		if (*line == '\0')
@@ -62,35 +62,40 @@ int	main(int ac, char **av, char **envp)
 			pipeline = build_pipeline(shell.commands);
 			if (pipeline)
 			{
-				run_pipeline(pipeline, &envc);
+				//run_pipeline(pipeline, &envc);
+				run_pipeline(pipeline, &shell); // modificato
 				free_pipeline(pipeline);
 			}
-			shell.exit_status = envc.exit_code;
+			shell.exit_status = shell.envc.exit_code; // modificato
 			free_commands(shell.commands);
 			shell.commands = NULL;
-			if (envc.should_exit)
+			if (shell.envc.should_exit)  // modificato
 				break ;
 		}
 	}
 	cleanup_shell(&shell);
-	free_envc(&envc);
 	return (shell.exit_status);
 }
 
-void	init_shell(t_shell *shell, char **env)
+void	init_shell(t_shell *shell, char **envp)  // modificato
 {
 	shell->tokens = NULL;
 	shell->commands = NULL;
-	shell->env = copy_env(env);  //  <-- make a copy !!!
 	shell->exit_status = 0;
+	// Initialize envc directly inside shell
+	if (init_envc(&shell->envc, envp) < 0) 
+	{
+		shell->envc.env = NULL;
+	}
 }
 
 void	cleanup_shell(t_shell *shell)
 {
-	rl_clear_history();  	// Clear readline history
+	rl_clear_history();  	
 	
-	if (shell->tokens) 		// Free any remaining tokens or commands
+	if (shell->tokens) 		
 		free_tokens(shell->tokens);
 	if (shell->commands)
 		free_commands(shell->commands);
+	free_envc(&shell->envc);  // modificato
 }

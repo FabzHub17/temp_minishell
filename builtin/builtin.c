@@ -102,31 +102,31 @@ int is_builtin(char *cmd)
 **   The exit status returned by the builtin function.
 **   If the command is not a builtin, returns 0.
 */
-int execute_builtin(t_exec_cmd *cmd, t_envc *envc)
+int execute_builtin(t_exec_cmd *cmd, t_shell *shell) // modificato
 {
     int status;
 
-    if (!cmd || !cmd->argv || !cmd->argv[0])
+    if (!cmd || !cmd->argv || !cmd->argv[0] || !shell)
         return 0;
 
     if (ft_strcmp(cmd->argv[0], "cd") == 0)
-        status = cd_builtin(cmd->argv, envc);
+        status = cd_builtin(cmd->argv, &shell->envc);
     else if (ft_strcmp(cmd->argv[0], "echo") == 0)
         status = echo_builtin(cmd->argv);
     else if (ft_strcmp(cmd->argv[0], "pwd") == 0)
         status = pwd_builtin();
     else if (ft_strcmp(cmd->argv[0], "export") == 0)
-        status = export_builtin(cmd, envc);
+        status = export_builtin(cmd, &shell->envc);
     else if (ft_strcmp(cmd->argv[0], "unset") == 0)
-        status = unset_builtin(cmd, envc);
+        status = unset_builtin(cmd, &shell->envc);
     else if (ft_strcmp(cmd->argv[0], "env") == 0)
-        status = env_builtin(cmd, envc);
+        status = env_builtin(cmd, &shell->envc);
     else if (ft_strcmp(cmd->argv[0], "exit") == 0)
-        status = exit_builtin(cmd->argv, envc);
+        status = exit_builtin(cmd->argv, &shell->envc);
     else
         return 0;
 
-    envc->exit_code = status;
+    shell->envc.exit_code = status;
     return status;
 }
 

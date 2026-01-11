@@ -31,6 +31,20 @@
 # include "../libft/includes/libft.h"
 # include "../libft/includes/ft_printf.h"
 
+/* ===========================
+**  ENV WRAPPER (TUO)
+** =========================== */
+
+typedef struct s_envc
+{
+    char    **env;         // ambiente modificabile
+    int     exit_code;     // ultimo exit status
+    int     should_exit;   // flag per sapere se uscire dalla shell
+    int		heredoc_id;
+}   t_envc;
+
+int     init_envc(t_envc *envc, char **envp);
+void    free_envc(t_envc *envc);
 
 /* ===========================
 **  PARSER STRUCTS (FABIO)
@@ -72,39 +86,26 @@ typedef struct s_shell
 {
 	t_token			*tokens;
 	t_cmd			*commands;
-	char			**env;
+	//char			**env;
+	t_envc			envc;  // modificato
 	int				exit_status;
 }					t_shell;
 
 // Expansion context structure
 typedef struct s_expand_args
 {
-	char			**env;   // modified
 	int				exit_status;
 	char			*result;
+	t_shell			*shell;   // modified
 }					t_expand_args;
 
-/* ===========================
-**  ENV WRAPPER (TUO)
-** =========================== */
-
-typedef struct s_envc
-{
-    char    **env;         // ambiente modificabile
-    int     exit_code;     // ultimo exit status
-    int     should_exit;   // flag per sapere se uscire dalla shell
-    int		heredoc_id;
-}   t_envc;
-
-int     init_envc(t_envc *envc, char **envp);
-void    free_envc(t_envc *envc);
 
 /* ===========================
 **  PARSER API (FABIO)
 ** =========================== */
 
 // main
-void				init_shell(t_shell *shell, char **env);
+void				init_shell(t_shell *shell, char **envp); // modificato
 void				cleanup_shell(t_shell *shell);
 
 // lexer

@@ -19,6 +19,9 @@
 */
 int	expand_variable(char *str, int i, t_expand_args *expand_args)
 {
+	if (!expand_args->shell || !expand_args->shell->envc.env)
+		return (i);
+
 	i++;
 	if (str[i] == '?')
 	{
@@ -42,11 +45,17 @@ int	expand_env_variable(char *str, int i, t_expand_args *expand_args)
 	char	*var_value;
 	int		var_len;
 
+	if (!expand_args->shell)
+		return (i);
+
 	var_name = extract_var_name(str, i);
 	if (var_name == NULL)
 		return (i);
 
-	var_value = get_env_value(expand_args->env, var_name);
+	var_value = get_env_value(expand_args->shell->envc.env, var_name); // modificato
+
+	// DEBUG: Print result
+	printf("DEBUG: Found value: '%s'\n", var_value ? var_value : "(NULL)");
 	
 	if (var_value != NULL)
 	{

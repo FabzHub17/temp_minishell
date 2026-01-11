@@ -26,7 +26,7 @@ typedef struct s_exec_cmd t_exec_cmd;
 
 /* BUILTIN CHECK  */
 int     is_builtin(char *cmd);
-int     execute_builtin(t_exec_cmd *cmd, t_envc *envc);
+int     execute_builtin(t_exec_cmd *cmd, t_shell *shell); // modificato
 
 /* BUILTINS */
 int     cd_builtin(char **ac, t_envc *envc);

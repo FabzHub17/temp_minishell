@@ -84,9 +84,9 @@ OBJ = $(SRC:%.c=$(OBJ_DIR)/%.o)
 #                                  COMPILATION                                 #
 # **************************************************************************** #
 
-CC = cc
+CC = gcc
 CFLAGS = -Wall -Wextra -Werror \
-         -I$(INC_DIR) -I$(LIBFT_DIR)/includes -g
+         -I$(INC_DIR) -I$(LIBFT_DIR)/includes
 
 # **************************************************************************** #
 #                                    RULES                                     #

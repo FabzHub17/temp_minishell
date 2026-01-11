@@ -73,10 +73,10 @@ void    close_parent_fds(int prev_read, int pipefd[2], int is_last);
 void    wait_pipeline(pid_t last_pid, t_envc *envc);
 
 /* Redirections */
-int     apply_redirections(t_redir *redirs, t_envc *envc);
+int     apply_redirections(t_redir *redirs, t_shell *shell);
 
 /* run_pipeline: entry point dall'esterno (bridge) */
-void    run_pipeline(t_pipeline *p, t_envc *envc);
+void    run_pipeline(t_pipeline *p, t_shell *shell);  // modificato
 
 /* ************************************************************************** */
 /*                          PARSER → EXECUTION BRIDGE                         */
