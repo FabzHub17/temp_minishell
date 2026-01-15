@@ -13,7 +13,7 @@
 #include "execution.h"
 #include "minishell.h"
 
-static int	process_cmd_redirs(t_exec_cmd *cmd, t_envc *envc)
+static int	process_cmd_redirs(t_exec_cmd *cmd, t_shell *shell)
 {
 	t_redir	*redir;
 
@@ -22,7 +22,7 @@ static int	process_cmd_redirs(t_exec_cmd *cmd, t_envc *envc)
 	{
 		if (redir->type == R_HEREDOC)
 		{
-			if (create_heredoc_for_redir(redir, envc) != 0)
+			if (create_heredoc_for_redir(redir, shell) != 0)
 				return (-1);
 		}
 		redir = redir->next;
@@ -30,7 +30,7 @@ static int	process_cmd_redirs(t_exec_cmd *cmd, t_envc *envc)
 	return (0);
 }
 
-int	handle_heredocs(t_pipeline *p, t_envc *envc)
+int	handle_heredocs(t_pipeline *p, t_shell *shell)
 {
 	int		i;
 
@@ -39,7 +39,7 @@ int	handle_heredocs(t_pipeline *p, t_envc *envc)
 	i = 0;
 	while (i < (int)p->count)
 	{
-		if (process_cmd_redirs(p->cmds[i], envc) == -1)
+		if (process_cmd_redirs(p->cmds[i], shell) == -1)
 			return (-1);
 		i++;
 	}

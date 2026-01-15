@@ -27,25 +27,25 @@
     }
 }*/
 
-static void	update_exit_status(int status, t_envc *envc)
+static void	update_exit_status(int status, t_shell *shell)
 {
 	if (WIFEXITED(status))
-		envc->exit_code = WEXITSTATUS(status);
+		shell->envc.exit_code = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
 	{
 		if (WTERMSIG(status) == SIGINT)
-			envc->exit_code = 130;
+			shell->envc.exit_code = 130;
 		else if (WTERMSIG(status) == SIGQUIT)
 		{
-			envc->exit_code = 131;
+			shell->envc.exit_code = 131;
 			ft_putstr_fd("Quit (core dumped)\n", 2);
 		}
 		else
-			envc->exit_code = 128 + WTERMSIG(status);
+			shell->envc.exit_code = 128 + WTERMSIG(status);
 	}
 }
 
-void wait_pipeline(pid_t last_pid, t_envc *envc)
+void wait_pipeline(pid_t last_pid, t_shell *shell)
 {
     pid_t pid;
     int status;
@@ -53,7 +53,7 @@ void wait_pipeline(pid_t last_pid, t_envc *envc)
     while ((pid = wait(&status)) > 0)
     {
         if (pid == last_pid)
-            update_exit_status(status, envc);
+            update_exit_status(status, shell);
     }
 }
 

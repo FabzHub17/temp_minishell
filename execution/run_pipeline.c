@@ -65,8 +65,7 @@ void	run_pipeline(t_pipeline *p, t_shell *shell)
 	if (!p || p->count == 0)
 		return ;
 	// Create a local envc pointer for compatibility
-	t_envc *envc = &shell->envc;  // modificato
-	if (handle_heredocs(p, envc) != 0)
+	if (handle_heredocs(p, shell) != 0)
 		return ;
 	if (p->count == 1)
 	{
@@ -79,7 +78,7 @@ void	run_pipeline(t_pipeline *p, t_shell *shell)
 			execute_single_cmd(cmd, shell);
 	}
 	else
-		exec_pipeline(p, envc);
+		exec_pipeline(p, shell);
 }
 
 /*void	run_pipeline(t_pipeline *p, t_envc *envc)

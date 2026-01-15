@@ -28,7 +28,7 @@
 ** Return: 0 on success, -1 on failure.
 */
 static int	create_pipe_if_needed(int is_last, int pipefd[2],
-				int prev_read, t_envc *envc)
+				int prev_read, t_shell *shell)
 {
 	if (!is_last)
 	{
@@ -37,7 +37,7 @@ static int	create_pipe_if_needed(int is_last, int pipefd[2],
 			perror("minishell: pipe");
 			if (prev_read != -1)
 				close(prev_read);
-			envc->exit_code = 1;
+			shell->envc.exit_code = 1;
 			return (-1);
 		}
 	}
@@ -59,7 +59,7 @@ static int	create_pipe_if_needed(int is_last, int pipefd[2],
 ** Return: always -1.
 */
 static int	handle_fork_error(int is_last, int pipefd[2],
-				int prev_read, t_envc *envc)
+				int prev_read, t_shell *shell)
 {
 	perror("minishell: fork");
 	if (!is_last)
@@ -69,7 +69,7 @@ static int	handle_fork_error(int is_last, int pipefd[2],
 	}
 	if (prev_read != -1)
 		close(prev_read);
-	envc->exit_code = 1;
+	shell->envc.exit_code = 1;
 	return (-1);
 }
 
@@ -107,7 +107,7 @@ static int	is_last_cmd(t_pipeline *p, int i)
 **
 ** Return: 0 on success, -1 on failure.
 */
-static int  run_one_child(t_pipeline *p, t_envc *envc,
+static int  run_one_child(t_pipeline *p, t_shell *shell,
                         int i, int *prev_read, pid_t *last_pid)
 {
         int     pipefd[2];
@@ -115,15 +115,15 @@ static int  run_one_child(t_pipeline *p, t_envc *envc,
         pid_t   pid;
 
         is_last = is_last_cmd(p, i);
-        if (create_pipe_if_needed(is_last, pipefd, *prev_read, envc) == -1)
+        if (create_pipe_if_needed(is_last, pipefd, *prev_read, shell) == -1)
                 return (-1);
 
         pid = fork();
         if (pid == -1)
-                return (handle_fork_error(is_last, pipefd, *prev_read, envc));
+                return (handle_fork_error(is_last, pipefd, *prev_read, shell));
 
         if (pid == 0)
-                exec_pipeline_child(p, envc, i, *prev_read, pipefd);
+                exec_pipeline_child(p, shell, i, *prev_read, pipefd);
         close_parent_fds(*prev_read, pipefd, is_last);
         if (is_last)
                 *prev_read = -1;
@@ -146,7 +146,7 @@ static int  run_one_child(t_pipeline *p, t_envc *envc,
 ** remaining file descriptor, waits for the last command (to set the exit code),
 ** and restores interactive shell signals.
 */
-void    exec_pipeline(t_pipeline *p, t_envc *envc)
+void    exec_pipeline(t_pipeline *p, t_shell *shell)
 {
         int     i;
         int     prev_read;
@@ -160,13 +160,13 @@ void    exec_pipeline(t_pipeline *p, t_envc *envc)
         i = 0;
         while (i < (int)p->count)
         {
-                if (run_one_child(p, envc, i, &prev_read, &last_pid) == -1)
+                if (run_one_child(p, shell, i, &prev_read, &last_pid) == -1)
                         break ;
                 i++;
         }
         if (prev_read != -1)
                 close(prev_read);
         if (last_pid != -1)
-                wait_pipeline(last_pid, envc);
+                wait_pipeline(last_pid, shell);
         setup_signals_interactive();
 }

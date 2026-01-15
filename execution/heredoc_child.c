@@ -26,9 +26,9 @@
 ** The 'envc' parameter would be used to perform that expansion.
 ** Returning a strdup keeps the logic consistent for now.
 */
-static char	*expand_heredoc_line(char *line, t_envc *envc)
+static char	*expand_heredoc_line(char *line, t_shell *shell)
 {
-	(void)envc;
+	(void)shell;
 	return (ft_strdup(line));
 }
 
@@ -66,13 +66,13 @@ static int	write_line_to_fd(int fd, char *to_write)
 **
 ** Returns 0 on success, -1 on memory/write error.
 */
-static int	process_line(char *line, int fd, t_envc *envc, int expand)
+static int	process_line(char *line, int fd, t_shell *shell, int expand)
 {
 	char	*to_write;
 
 	if (expand)
 	{
-		to_write = expand_heredoc_line(line, envc);
+		to_write = expand_heredoc_line(line, shell);
 		free(line);
 		if (!to_write)
 			return (-1);
@@ -101,7 +101,7 @@ static int	process_line(char *line, int fd, t_envc *envc, int expand)
 **
 ** Returns 0 on success, -1 if processing a line fails.
 */
-static int	read_heredoc_loop(const char *delim, int fd, t_envc *envc, int exp)
+static int	read_heredoc_loop(const char *delim, int fd, t_shell *shell, int exp)
 {
 	char	*line;
 
@@ -115,7 +115,7 @@ static int	read_heredoc_loop(const char *delim, int fd, t_envc *envc, int exp)
 			free(line);
 			break ;
 		}
-		if (process_line(line, fd, envc, exp) == -1)
+		if (process_line(line, fd, shell, exp) == -1)
 			return (-1);
 	}
 	return (0);
@@ -133,7 +133,7 @@ static int	read_heredoc_loop(const char *delim, int fd, t_envc *envc, int exp)
 ** On success, returns 0.
 */
 int	heredoc_child_process(const char *delim, const char *filename,
-		t_envc *envc, int expand)
+		t_shell *shell, int expand)
 {
 	int		fd;
 
@@ -143,7 +143,7 @@ int	heredoc_child_process(const char *delim, const char *filename,
 		perror("minishell: heredoc open");
 		return (1);
 	}
-	if (read_heredoc_loop(delim, fd, envc, expand) == -1)
+	if (read_heredoc_loop(delim, fd, shell, expand) == -1)
 	{
 		close(fd);
 		return (1);

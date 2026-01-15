@@ -34,17 +34,17 @@
 ** Case 3: Success
 **   -> Return 0
 */
-static int	handle_child_status(int status, char *filename, t_envc *envc)
+static int	handle_child_status(int status, char *filename, t_shell *shell)
 {
 	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
 	{
-		envc->exit_code = 130;
+		shell->envc.exit_code = 130;
 		unlink(filename);
 		return (-1);
 	}
 	if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
 	{
-		envc->exit_code = 1;
+		shell->envc.exit_code = 1;
 		unlink(filename);
 		return (-1);
 	}
@@ -69,7 +69,7 @@ static int	handle_child_status(int status, char *filename, t_envc *envc)
 **   - Waits with waitpid()
 **   - Passes the result to handle_child_status()
 */
-static int	fork_heredoc(char *del, char *filename, t_envc *envc, int exp)
+static int	fork_heredoc(char *del, char *filename, t_shell *shell, int exp)
 {
 	pid_t	pid;
 	int	status;
@@ -83,12 +83,12 @@ static int	fork_heredoc(char *del, char *filename, t_envc *envc, int exp)
 	if (pid == 0)
 	{
 		setup_signals_child();
-		if (heredoc_child_process(del, filename, envc, exp) != 0)
+		if (heredoc_child_process(del, filename, shell, exp) != 0)
 			exit(1);
 		exit(0);
 	}
 	waitpid(pid, &status, 0);
-	return (handle_child_status(status, filename, envc));
+	return (handle_child_status(status, filename, shell));
 }
 
 /*
@@ -127,7 +127,7 @@ static void	cleanup_heredoc(char *delim, char *filename)
 **   0 on success
 **  -1 on failure
 */
-int	create_heredoc_for_redir(t_redir *redir, t_envc *envc)
+int	create_heredoc_for_redir(t_redir *redir, t_shell *shell)
 {
 	char	*filename;
 	char	*delim;
@@ -137,13 +137,13 @@ int	create_heredoc_for_redir(t_redir *redir, t_envc *envc)
 	delim = remove_quotes(redir->target);
 	if (!delim)
 		return (-1);
-	filename = tmp_heredoc(envc);
+	filename = tmp_heredoc(shell);
 	if (!filename)
 	{
 		free(delim);
 		return (-1);
 	}
-	if (fork_heredoc(delim, filename, envc, expand) == -1)
+	if (fork_heredoc(delim, filename, shell, expand) == -1)
 	{
 		cleanup_heredoc(delim, filename);
 		return (-1);

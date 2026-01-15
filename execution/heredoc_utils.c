@@ -15,15 +15,15 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-char	*tmp_heredoc(t_envc *envc)
+char	*tmp_heredoc(t_shell *shell)
 {
 	char	*str;
 	char	*name;
 
-	str = ft_itoa(envc->heredoc_id);
+	str = ft_itoa(shell->envc.heredoc_id);
 	if (!str)
 		return (NULL);
-	envc->heredoc_id++;
+	shell->envc.heredoc_id++;
 	name = ft_strjoin(".heredoc_", str);
 	free(str);
 	return (name);

@@ -64,13 +64,13 @@ char	*find_command(char *cmd, char **envp);
 void    execute_single_cmd(t_exec_cmd *cmd, t_shell *shell);
 
 /* Pipeline (multi comandi) */
-void    exec_pipeline(t_pipeline *p, t_envc *envc);
+void    exec_pipeline(t_pipeline *p, t_shell *shell);
 void    exec_pipeline_child(t_pipeline *p, t_shell *shell,
                              int i, int prev_read, int pipefd[2]);
 int     handle_input_fd(int prev_read);
 int     handle_output_fd(int is_last, int pipefd[2]);
 void    close_parent_fds(int prev_read, int pipefd[2], int is_last);
-void    wait_pipeline(pid_t last_pid, t_envc *envc);
+void    wait_pipeline(pid_t last_pid, t_shell *shell);
 
 /* Redirections */
 int     apply_redirections(t_redir *redirs, t_shell *shell);
@@ -99,12 +99,12 @@ t_exec_cmd  *build_exec_cmd(t_cmd *p);
 t_pipeline  *build_pipeline(t_cmd *parsed);
 
 /* Heredoc functions */
-int     handle_heredocs(t_pipeline *p, t_envc *envc);
-char    *tmp_heredoc(t_envc *envc);
+int     handle_heredocs(t_pipeline *p, t_shell *shell);
+char    *tmp_heredoc(t_shell *shell);
 int     heredoc_quote(const char *sign);
 char    *remove_quotes(const char *sign);
 int     heredoc_child_process(const char *delim, const char *filename,
-            t_envc *envc, int expand);
-int     create_heredoc_for_redir(t_redir *redir, t_envc *envc);
+            t_shell *shell, int expand);
+int     create_heredoc_for_redir(t_redir *redir, t_shell *shell);
 
 #endif
