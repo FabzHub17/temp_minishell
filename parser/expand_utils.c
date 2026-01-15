@@ -55,7 +55,7 @@ int	expand_env_variable(char *str, int i, t_expand_args *expand_args)
 	var_value = get_env_value(expand_args->shell->envc.env, var_name); // modificato
 
 	// DEBUG: Print result
-	printf("DEBUG: Found value: '%s'\n", var_value ? var_value : "(NULL)");
+	//printf("DEBUG: Found value: '%s'\n", var_value ? var_value : "(NULL)");
 	
 	if (var_value != NULL)
 	{

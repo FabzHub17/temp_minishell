@@ -76,7 +76,7 @@ void	run_pipeline(t_pipeline *p, t_shell *shell)
 		if (is_builtin(cmd->argv[0]))
 			exec_builtin_in_parent(cmd, shell);
 		else
-			execute_single_cmd(cmd, envc);
+			execute_single_cmd(cmd, shell);
 	}
 	else
 		exec_pipeline(p, envc);

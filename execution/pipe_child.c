@@ -12,9 +12,9 @@
 
 #include "execution.h"
 
-static void exec_with_path(t_exec_cmd *cmd, t_envc *envc)
+static void exec_with_path(t_exec_cmd *cmd, t_shell *shell)
 {
-    char *path = find_command(cmd->argv[0], envc->env);
+    char *path = find_command(cmd->argv[0], shell->envc.env);
 
     if (!path)
     {
@@ -23,7 +23,7 @@ static void exec_with_path(t_exec_cmd *cmd, t_envc *envc)
         ft_putstr_fd(": command not found\n", 2);
         exit(127);
     }
-    execve(path, cmd->argv, envc->env);
+    execve(path, cmd->argv, shell->envc.env);
     perror("minishell: execve");
     exit(126);
 }
@@ -36,15 +36,15 @@ static void prepare_child_fds(t_pipeline *p, int i, int prev_read, int pipefd[2]
         exit(1);
 }
 
-void exec_pipeline_child(t_pipeline *p, t_envc *envc,
+void exec_pipeline_child(t_pipeline *p, t_shell *shell,
                          int i, int prev_read, int pipefd[2])
 {
     setup_signals_child();
     prepare_child_fds(p, i, prev_read, pipefd);
-    if (apply_redirections(p->cmds[i]->redirs, envc) != 0)
-        exit(envc->exit_code);
+    if (apply_redirections(p->cmds[i]->redirs, shell) != 0)
+        exit(shell->envc.exit_code);
     if (!p->cmds[i]->argv || !p->cmds[i]->argv[0])
         exit(0);
-    exec_with_path(p->cmds[i], envc);
+    exec_with_path(p->cmds[i], shell);
 }
 

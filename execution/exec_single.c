@@ -31,32 +31,32 @@
 **
 ** This function never returns: the child ends by execve() or exit().
 */
-static void exec_external_child(t_exec_cmd *cmd, t_envc *envc)
+static void exec_external_child(t_exec_cmd *cmd, t_shell *shell)
 {
     char    *path;
 
     setup_signals_child();
-    if (apply_redirections(cmd->redirs, envc) != 0)
-        exit(envc->exit_code);
+    if (apply_redirections(cmd->redirs, shell) != 0)
+        exit(shell->envc.exit_code);
     if (!cmd->argv || !cmd->argv[0])
         exit(0);
-    path = find_command(cmd->argv[0], envc->env);
+    path = find_command(cmd->argv[0], shell->envc.env);
     if (!path)
     {
         ft_putstr_fd("minishell: ", 2);
         ft_putstr_fd(cmd->argv[0], 2);
         ft_putstr_fd(": command not found\n", 2);
-        envc->exit_code = 127;
-        exit(envc->exit_code);
+        shell->envc.exit_code = 127;
+        exit(shell->envc.exit_code);
     }
-    execve(path, cmd->argv, envc->env);
+    execve(path, cmd->argv, shell->envc.env);
     perror("minishell: execve");
     free(path);
     if (errno == EACCES)
-        envc->exit_code = 126;
+        shell->envc.exit_code = 126;
     else
-        envc->exit_code = 127;
-    exit(envc->exit_code);
+        shell->envc.exit_code = 127;
+    exit(shell->envc.exit_code);
 }
 
 /*
@@ -73,21 +73,21 @@ static void exec_external_child(t_exec_cmd *cmd, t_envc *envc)
 **     SIGQUIT → 131 + prints "Quit (core dumped)"
 **     Other   → 128 + signal number
 */
-static void  update_exit_status_from_wait(int status, t_envc *envc)
+static void  update_exit_status_from_wait(int status, t_shell *shell)
 {
     if (WIFEXITED(status))
-        envc->exit_code = WEXITSTATUS(status);
+        shell->envc.exit_code = WEXITSTATUS(status);
     else if (WIFSIGNALED(status))
     {
         if (WTERMSIG(status) == SIGINT)
-            envc->exit_code = 130;
+            shell->envc.exit_code = 130;
         else if (WTERMSIG(status) == SIGQUIT)
         {
-            envc->exit_code = 131;
+            shell->envc.exit_code = 131;
             ft_putstr_fd("Quit (core dumped)\n", 2);
         }
         else
-            envc->exit_code = 128 + WTERMSIG(status);
+            shell->envc.exit_code = 128 + WTERMSIG(status);
     }
 }
 
@@ -103,7 +103,7 @@ static void  update_exit_status_from_wait(int status, t_envc *envc)
 ** behavior, waits for termination, and updates the exit code accordingly.
 ** Handles fork() and waitpid() errors gracefully.
 */
-void    execute_single_cmd(t_exec_cmd *cmd, t_envc *envc)
+void    execute_single_cmd(t_exec_cmd *cmd, t_shell *shell)
 {
     pid_t   pid;
     int     status;
@@ -115,19 +115,19 @@ void    execute_single_cmd(t_exec_cmd *cmd, t_envc *envc)
     if (pid < 0)
     {
         perror("minishell: fork");
-        envc->exit_code = 1;
+        shell->envc.exit_code = 1;
         setup_signals_interactive();
         return ;
     }
     if (pid == 0)
-        exec_external_child(cmd, envc);
+        exec_external_child(cmd, shell);
     if (waitpid(pid, &status, 0) == -1)
     {
         perror("minishell: waitpid");
-        envc->exit_code = 1;
+        shell->envc.exit_code = 1;
     }
     else
-        update_exit_status_from_wait(status, envc);
+        update_exit_status_from_wait(status, shell);
     setup_signals_interactive();
 }
 

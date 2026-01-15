@@ -61,11 +61,11 @@ typedef struct s_pipeline
 char	*find_command(char *cmd, char **envp);
 
 /* Esecuzione di un singolo comando esterno */
-void    execute_single_cmd(t_exec_cmd *cmd, t_envc *envc);
+void    execute_single_cmd(t_exec_cmd *cmd, t_shell *shell);
 
 /* Pipeline (multi comandi) */
 void    exec_pipeline(t_pipeline *p, t_envc *envc);
-void    exec_pipeline_child(t_pipeline *p, t_envc *envc,
+void    exec_pipeline_child(t_pipeline *p, t_shell *shell,
                              int i, int prev_read, int pipefd[2]);
 int     handle_input_fd(int prev_read);
 int     handle_output_fd(int is_last, int pipefd[2]);
