@@ -54,6 +54,8 @@ int	main(int ac, char **av, char **envp)
 		if (!shell.tokens)
 			continue ;
 		process_quotes_and_expansion(&shell);
+		if (!shell.tokens)
+			continue ;
 		shell.commands = parse_tokens(shell.tokens);
 		free_tokens(shell.tokens);
 		shell.tokens = NULL;

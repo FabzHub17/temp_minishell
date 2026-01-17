@@ -31,11 +31,17 @@ void	process_quotes_and_expansion(t_shell *shell)
 		{
 			processed_value = remove_quotes_and_expand(current_token->value,
 					&expand_args);
-			if (processed_value != NULL)
+			if (processed_value == NULL)
 			{
-				free(current_token->value);
-				current_token->value = processed_value;
+				ft_putendl_fd("syntax error: unclosed quote", 2);
+				shell->exit_status = 2;  // da controllare
+				// Pulizia e uscita immediata
+				free_tokens(shell->tokens);
+				shell->tokens = NULL;
+				return ;
 			}
+			free(current_token->value);
+			current_token->value = processed_value;
 		}
 		current_token = current_token->next;
 	}
@@ -48,23 +54,31 @@ void	process_quotes_and_expansion(t_shell *shell)
 char	*remove_quotes_and_expand(char *str, t_expand_args *expand_args)
 {
 	int	i;
+	int next;
 
 	expand_args->result = ft_strdup("");
 	i = 0;
 	while (str[i] != '\0')
 	{
 		if (str[i] == '\'')
-			i = handle_single_quotes(str, i, expand_args);
+			next = handle_single_quotes(str, i, expand_args);
 		else if (str[i] == '\"')
-			i = handle_double_quotes(str, i, expand_args);
+			next = handle_double_quotes(str, i, expand_args);
 		else if (str[i] == '$')
-			i = expand_variable(str, i, expand_args);
+			next = expand_variable(str, i, expand_args);
 		else
 		{
 			expand_args->result = ft_strjoin_free(expand_args->result,
 					ft_substr(str, i, 1));
 			i++;
+			continue;
 		}
+		if (next == -1)
+		{
+			free(expand_args->result);
+			return (NULL);
+		}
+		i = next;
 	}
 	return (expand_args->result);
 }
@@ -81,6 +95,8 @@ int	handle_single_quotes(char *str, int i, t_expand_args *expand_args)
 				ft_substr(str, i, 1));
 		i++;
 	}
+	if(str[i] == '\0')
+		return (-1);  // quote non chiusa
 	if (str[i] == '\'')
 		i++;
 	return (i);
@@ -103,6 +119,8 @@ int	handle_double_quotes(char *str, int i, t_expand_args *expand_args)
 			i++;
 		}
 	}
+	if (str[i] == '\0')
+		return (-1);  // quote non chiusa
 	if (str[i] == '\"')
 		i++;
 	return (i);
