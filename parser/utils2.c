@@ -58,30 +58,6 @@ void	free_commands(t_cmd *commands)
 }
 
 /*
-** Get environment variable value
-*/
-/*char	*get_env_value(char *var_name, char **env)
-{
-	int		i;
-	int		len;
-	char	*env_var;
-
-	i = 0;
-	len = ft_strlen(var_name);
-	while (env[i] != NULL)
-	{
-		if (ft_strncmp(env[i], var_name, len) == 0 && env[i][len] == '=')
-		{
-			env_var = ft_strdup(env[i] + len + 1);
-			return (env_var);
-		}
-		i++;
-	}
-	return (NULL);
-}
-*/
-
-/*
 ** Extract variable name from string (alphanumeric + underscore)
 */
 char	*extract_var_name(char *str, int i)
@@ -109,7 +85,6 @@ void	add_command(t_cmd **cmd_list, t_cmd *new_cmd)
 
 	if (new_cmd == NULL)
 		return ;
-	
 	if (*cmd_list == NULL)
 	{
 		*cmd_list = new_cmd;
@@ -122,4 +97,3 @@ void	add_command(t_cmd **cmd_list, t_cmd *new_cmd)
 		current->next = new_cmd;
 	}
 }
-

@@ -6,7 +6,7 @@
 /*   By: tvithara <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/07 15:19:10 by tvithara          #+#    #+#             */
-/*   Updated: 2025/12/07 15:19:14 by tvithara         ###   ########.fr       */
+/*   Updated: 2026/01/17 12:09:48 by tvithara         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ int	expand_variable(char *str, int i, t_expand_args *expand_args)
 {
 	if (!expand_args->shell || !expand_args->shell->envc.env)
 		return (i);
-
 	i++;
 	if (str[i] == '?')
 	{
@@ -47,16 +46,10 @@ int	expand_env_variable(char *str, int i, t_expand_args *expand_args)
 
 	if (!expand_args->shell)
 		return (i);
-
 	var_name = extract_var_name(str, i);
 	if (var_name == NULL)
 		return (i);
-
-	var_value = get_env_value(expand_args->shell->envc.env, var_name); // modificato
-
-	// DEBUG: Print result
-	//printf("DEBUG: Found value: '%s'\n", var_value ? var_value : "(NULL)");
-	
+	var_value = get_env_value(expand_args->shell->envc.env, var_name);
 	if (var_value != NULL)
 	{
 		expand_args->result = ft_strjoin_free(expand_args->result,
