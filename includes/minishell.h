@@ -106,6 +106,7 @@ typedef struct s_expand_args
 // main
 void							init_shell(t_shell *shell, char **envp);
 void							cleanup_shell(t_shell *shell);
+int								process_input_line(char *line, t_shell *shell);
 
 // lexer
 t_token							*tokenize_input(char *input);
@@ -156,5 +157,5 @@ extern volatile sig_atomic_t	g_signal;
 void							setup_signals_interactive(void);
 void							setup_signals_child(void);
 void							setup_signals_parent_exec(void);
-
+void							handle_signal_status(t_shell *shell);
 #endif

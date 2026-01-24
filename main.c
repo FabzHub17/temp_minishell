@@ -20,12 +20,10 @@ int	main(int ac, char **av, char **envp)
 {
 	char		*line;
 	t_shell		shell;
-	//t_envc		envc;    modificato
-	t_pipeline	*pipeline;
 
 	(void)ac;
 	(void)av;
-	init_shell(&shell, envp);  // modificato
+	init_shell(&shell, envp);  
 	if (shell.envc.env == NULL)
 		return (1);
 	while (1)
@@ -37,43 +35,9 @@ int	main(int ac, char **av, char **envp)
 			ft_putendl_fd("exit", 1);
 			break ;
 		}
-		if (g_signal == SIGINT)
-		{
-			shell.exit_status = 130;
-			shell.envc.exit_code = 130;
-			g_signal = 0;
-		}
-		if (*line == '\0')
-		{
-			free(line);
-			continue ;
-		}
-		add_history(line);
-		shell.tokens = tokenize_input(line);
-		free(line);
-		if (!shell.tokens)
-			continue ;
-		process_quotes_and_expansion(&shell);
-		if (!shell.tokens)
-			continue ;
-		shell.commands = parse_tokens(shell.tokens);
-		free_tokens(shell.tokens);
-		shell.tokens = NULL;
-		if (shell.commands)
-		{
-			pipeline = build_pipeline(shell.commands);
-			if (pipeline)
-			{
-				//run_pipeline(pipeline, &envc);
-				run_pipeline(pipeline, &shell); // modificato
-				free_pipeline(pipeline);
-			}
-			shell.exit_status = shell.envc.exit_code; // modificato
-			free_commands(shell.commands);
-			shell.commands = NULL;
-			if (shell.envc.should_exit)  // modificato
-				break ;
-		}
+		handle_signal_status(&shell);
+		if (process_input_line(line, &shell) == 1)
+			break ;
 	}
 	cleanup_shell(&shell);
 	return (shell.exit_status);
@@ -86,9 +50,7 @@ void	init_shell(t_shell *shell, char **envp)  // modificato
 	shell->exit_status = 0;
 	// Initialize envc directly inside shell
 	if (init_envc(&shell->envc, envp) < 0) 
-	{
 		shell->envc.env = NULL;
-	}
 }
 
 void	cleanup_shell(t_shell *shell)
@@ -99,5 +61,15 @@ void	cleanup_shell(t_shell *shell)
 		free_tokens(shell->tokens);
 	if (shell->commands)
 		free_commands(shell->commands);
-	free_envc(&shell->envc);  // modificato
+	free_envc(&shell->envc); 
+}
+
+void	handle_signal_status(t_shell *shell)
+{
+	if (g_signal == SIGINT)
+	{
+		shell->exit_status = 130;
+		shell->envc.exit_code = 130;
+		g_signal = 0;
+	}
 }

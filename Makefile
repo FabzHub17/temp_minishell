@@ -72,6 +72,7 @@ SIGNAL_SRCS = signals/signals.c
 
 # ALL SRC
 SRC =  main.c \
+       handle_input.c \
        $(PARSER_SRCS) \
        $(BUILDER_SRCS) \
        $(BUILTIN_SRCS) \
